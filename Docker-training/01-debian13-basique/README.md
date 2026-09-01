@@ -1,60 +1,78 @@
-# 01-debian13-basique
+# 🐳 Docker - Debian 13 Basique
 
-## Description du projet
+## 📖 Description
 
-Ce dépôt contient un exercice pratique pour construire une image Docker minimale basée sur Debian 13. L'objectif principal était d'apprendre, par la pratique, les étapes concrètes pour produire une image légère, sécurisée et réutilisable : rédaction d'un Dockerfile, installation minimale de paquets, gestion des couches, nettoyage et tests basiques.
+Exercice pratique de construction d'une image Docker minimale basée sur **Debian 13 (Trixie)** avec une application **FastAPI** exposant un endpoint de santé `/health`.
 
-## Objectifs
+## 🎯 Objectifs
 
-- Construire une image Docker fonctionnelle et reproductible basée sur Debian 13.
-- Installer uniquement les paquets nécessaires et documenter pourquoi ils sont présents.
-- Réduire la taille de l'image en limitant les couches et en nettoyant les caches temporaires.
-- Appliquer des bonnes pratiques de sécurité (utilisateur non-root, least privilege).
-- Donner des commandes claires pour construire, tester et déboguer l'image localement.
+- Construire une image Docker fonctionnelle et reproductible
+- Installer uniquement les paquets nécessaires
+- Réduire la taille de l'image (nettoyage des caches, couches optimisées)
+- Appliquer des bonnes pratiques de sécurité (utilisateur non-root)
 
+## 📁 Structure
 
-## Commandes utilisées (exemples)
+```
+01-debian13-basique/
+├── dockerfile
+└── app/
+    ├── main.py
+    └── requirements.txt
+```
 
-- Construire l'image :
+## 🚀 Installation et utilisation
 
-	docker build -t mon-image-debian13 .
+```bash
+# 1. Construire l'image
+docker build -t fastapi-auto .
 
-- Construire en mode nettoyage de cache (recommandé pour tests reproductibles) :
+# 2. Lancer le conteneur
+docker run -d -p 8000:8000 fastapi-auto
 
-	docker build --no-cache -t mon-image-debian13 .
+# 3. Tester
+curl http://localhost:8000/health
+# Réponse : {"status":"ok"}
+```
 
-- Lister les images :
+## ⚙️ Commandes utiles
 
-	docker images
+| Commande | Description |
+|----------|-------------|
+| `docker build -t fastapi-auto .` | Construire l'image |
+| `docker run -d -p 8000:8000 fastapi-auto` | Lancer en arrière-plan |
+| `docker run -it fastapi-auto bash` | Mode interactif |
+| `docker images` | Lister les images |
+| `docker ps` | Lister les conteneurs actifs |
+| `docker logs <container_id>` | Voir les logs |
+| `docker exec -it <container_id> bash` | Exécuter une commande |
+| `docker rmi fastapi-auto` | Supprimer l'image |
 
-- Lancer un conteneur interactif :
+## 🔍 Analyse avec Dive
 
-	docker run --rm -it mon-image-debian13 /bin/bash
+```bash
+# Installation
+sudo snap install dive
 
-- Lancer en détaché avec restriction de ressources (exemple) :
+# Analyse de l'image
+dive fastapi-auto
+```
 
-	docker run -d --name debian13 --memory=256m --cpus=0.5 mon-image-debian13
+## 💡 Bonnes pratiques appliquées
 
-- Exécuter une commande dans un conteneur existant :
+- ✅ Utilisateur non-root
+- ✅ Regroupement des commandes RUN
+- ✅ Nettoyage des caches apt
+- ✅ `--no-cache-dir` pour pip
+- ✅ Image légère et sécurisée
 
-	docker exec -it <container_id> /bin/bash
+## 🚀 Pistes d'amélioration
 
-- Supprimer une image :
+- [ ] Passer à une image alpine
+- [ ] Ajouter un healthcheck Docker
+- [ ] Mettre en place un CI/CD
+- [ ] Multi-stage builds
 
-	docker rmi mon-image-debian13
+## 📚 Ressources
 
-
-## Ce que j'ai appris
-
-- Rédiger un Dockerfile lisible et reproductible : ordre des instructions, utilisation de ARG/ENV et documentation inline.
-- Minimiser la taille d'image : combiner RUN quand c'est pertinent, nettoyer apt caches (apt-get clean && rm -rf /var/lib/apt/lists/*), et préférer des images parent légères.
-- Sécurité et permissions : créer et utiliser un utilisateur non-root dans l'image, limiter les capacités et éviter d'exposer inutilement des ports.
-- Tests basiques : démarrer un conteneur, vérifier que les services et binaires attendus sont présents, valider que l'image fonctionne avec --no-cache.
-- Bonnes pratiques supplémentaires : pinning des versions de paquets pour reproductibilité, commentaires expliquant pourquoi chaque paquet est installé, et envisager multi-stage build pour les images contenant des artefacts buildés.
-
-
-## Remarques et pistes d'amélioration
-
-Pour retrouver la méthodologie suivie, voir aussi le guide d'origine qui m'a aidé : https://github.com/stephrobert/containers-training/blob/main/00-Docker/01-debian12-basique/01-contruction-1ere-image.md
-
-``` 
+- [Guide d'origine](https://github.com/stephrobert/containers-training)
